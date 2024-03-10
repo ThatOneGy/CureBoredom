@@ -1,6 +1,7 @@
 {
-    "pack": {
-        "pack_format": 7,
-        "description": "A datapack which adds Quidditch to Minecraft using SethBling's physics datapack, enjoy!"
-    }
-}
+	"pack": {
+	  "pack_format": 7,
+	  "description": "Harry Potter Datapack"
+	}
+  }
+  

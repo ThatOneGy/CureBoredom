@@ -1,1 +1,0 @@
-tellraw @a {"text": "QuidCraft successfully loaded", "color": "#FFD700"}
