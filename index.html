@@ -1,18 +1,188 @@
-<script>
-    const roms = {
-        'Game 1': 'roms/game1.nes',
-        'Game 2': 'roms/game2.snes',
-        'Game 3': 'roms/game3.gba'
-    };
-
-    function loadROM(selectedROM) {
-        const romURL = roms[selectedROM];
-        if (romURL) {
-            Module.callMain([romURL]);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play ROMs in Browser</title>
+    <style>
+        /* Simple layout for sidebar and content */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            padding: 0;
         }
-    }
+        #sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-right: 1px solid #ccc;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        #main {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        #emulatorContainer {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            background-color: #000;
+        }
+        .keybind {
+            margin-bottom: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <h2>Controls</h2>
+        <div class="keybind">
+            <label for="upKey">Up:</label>
+            <input type="text" id="upKey" value="ArrowUp">
+        </div>
+        <div class="keybind">
+            <label for="downKey">Down:</label>
+            <input type="text" id="downKey" value="ArrowDown">
+        </div>
+        <div class="keybind">
+            <label for="leftKey">Left:</label>
+            <input type="text" id="leftKey" value="ArrowLeft">
+        </div>
+        <div class="keybind">
+            <label for="rightKey">Right:</label>
+            <input type="text" id="rightKey" value="ArrowRight">
+        </div>
+        <div class="keybind">
+            <label for="actionKey">Action (A):</label>
+            <input type="text" id="actionKey" value="z">
+        </div>
+        <div class="keybind">
+            <label for="jumpKey">Jump (B):</label>
+            <input type="text" id="jumpKey" value="x">
+        </div>
+        <button id="updateKeybinds">Update Keybinds</button>
 
-    document.getElementById('romSelector').addEventListener('change', function() {
-        loadROM(this.value);
-    });
-</script>
+        <!-- ROM Selector -->
+        <h3>Choose a ROM</h3>
+        <select id="romSelector">
+            <option value="Metroid Fusion.gba">Metroid Fusion</option>
+            <option value="game2.nes">Game 2</option>
+            <option value="game3.nes">Game 3</option>
+        </select>
+        <button id="loadGame">Play Game</button>
+
+        <!-- Copy/paste keybind area -->
+        <h3>Copy/Paste Keybinds</h3>
+        <textarea id="keybindsTextArea" placeholder="Paste keybinds here"></textarea>
+        <button id="applyKeybinds">Apply Keybinds</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main">
+        <h1>Welcome to My Game Emulator</h1>
+        <div id="emulatorContainer"></div>
+    </div>
+
+    <!-- Include the JavaScript emulator file -->
+    <script src="path-to-emulator.js"></script>
+
+    <script>
+        // Example predefined keybinds for each ROM
+        const romKeybinds = {
+            'game1.nes': {
+                up: "ArrowUp",
+                down: "ArrowDown",
+                left: "ArrowLeft",
+                right: "ArrowRight",
+                action: "z",
+                jump: "x"
+            },
+            'game2.nes': {
+                up: "w",
+                down: "s",
+                left: "a",
+                right: "d",
+                action: "j",
+                jump: "k"
+            },
+            'game3.nes': {
+                up: "i",
+                down: "k",
+                left: "j",
+                right: "l",
+                action: "a",
+                jump: "b"
+            }
+        };
+
+        // Set default keybinds for the selected ROM
+        function loadKeybindsForROM(rom) {
+            const keybinds = romKeybinds[rom];
+            document.getElementById('upKey').value = keybinds.up;
+            document.getElementById('downKey').value = keybinds.down;
+            document.getElementById('leftKey').value = keybinds.left;
+            document.getElementById('rightKey').value = keybinds.right;
+            document.getElementById('actionKey').value = keybinds.action;
+            document.getElementById('jumpKey').value = keybinds.jump;
+        }
+
+        // Update keybinds when ROM changes
+        document.getElementById('romSelector').addEventListener('change', function() {
+            loadKeybindsForROM(this.value);
+        });
+
+        // Update keybinds object from the form inputs
+        document.getElementById('updateKeybinds').addEventListener('click', function() {
+            const rom = document.getElementById('romSelector').value;
+            romKeybinds[rom] = {
+                up: document.getElementById('upKey').value,
+                down: document.getElementById('downKey').value,
+                left: document.getElementById('leftKey').value,
+                right: document.getElementById('rightKey').value,
+                action: document.getElementById('actionKey').value,
+                jump: document.getElementById('jumpKey').value
+            };
+            alert('Keybinds updated for ' + rom);
+        });
+
+        // Apply keybinds from the copy/paste area
+        document.getElementById('applyKeybinds').addEventListener('click', function() {
+            try {
+                const keybinds = JSON.parse(document.getElementById('keybindsTextArea').value);
+                const rom = document.getElementById('romSelector').value;
+                romKeybinds[rom] = keybinds;
+
+                // Apply the keybinds to the input fields
+                loadKeybindsForROM(rom);
+                alert('Keybinds applied from pasted data');
+            } catch (error) {
+                alert('Invalid keybind data. Please check the format.');
+            }
+        });
+
+        // Load the game and apply keybinds
+        document.getElementById('loadGame').addEventListener('click', function() {
+            const rom = document.getElementById('romSelector').value;
+            const keybinds = romKeybinds[rom];
+            
+            // Initialize the emulator (change 'EmulatorClass' to your specific emulator class)
+            const emulator = new EmulatorClass(); // Replace with your emulator class
+            emulator.loadROMFromURL(rom);
+            emulator.setKeybinds(keybinds); // Apply keybinds to the emulator
+
+            emulator.start();
+        });
+
+        // Load keybinds for the initial ROM
+        loadKeybindsForROM(document.getElementById('romSelector').value);
+    </script>
+</body>
+</html>
