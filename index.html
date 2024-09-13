@@ -1,0 +1,18 @@
+<script>
+    const roms = {
+        'Game 1': 'roms/game1.nes',
+        'Game 2': 'roms/game2.snes',
+        'Game 3': 'roms/game3.gba'
+    };
+
+    function loadROM(selectedROM) {
+        const romURL = roms[selectedROM];
+        if (romURL) {
+            Module.callMain([romURL]);
+        }
+    }
+
+    document.getElementById('romSelector').addEventListener('change', function() {
+        loadROM(this.value);
+    });
+</script>
